@@ -1,13 +1,9 @@
 /**
- * FIREBASE CONFIGURATION TEMPLATE
- * Masukkan kredensial Firebase Project Anda di sini,
- * atau atur langsung melalui menu "Konfigurasi Firebase" di dalam aplikasi.
+ * FIREBASE CONFIGURATION FOR SMART GROCERY
+ * Connected to Firebase Project: smartgrocery-3128a
  */
 window.FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  projectId: "smartgrocery-3128a",
+  authDomain: "smartgrocery-3128a.firebaseapp.com",
+  storageBucket: "smartgrocery-3128a.appspot.com"
 };
