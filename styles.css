@@ -2390,3 +2390,48 @@ button {
   animation: pulse-sync-chip 0.5s ease 2;
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
 }
+
+/* Store location chips and badge */
+.quick-store-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-top: -4px;
+  margin-bottom: 12px;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.quick-store-chips::-webkit-scrollbar { display: none; }
+.chip-store-opt {
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+.chip-store-opt:hover, .chip-store-opt.active {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--primary);
+  color: var(--primary-light);
+}
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  font-weight: 600;
+}
+.store-badge svg {
+  width: 10px;
+  height: 10px;
+}

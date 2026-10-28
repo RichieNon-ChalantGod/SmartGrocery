@@ -545,6 +545,9 @@ class AppController {
     this.btnModalQtyMinus = document.getElementById('btnModalQtyMinus');
     this.btnModalQtyPlus = document.getElementById('btnModalQtyPlus');
     this.inputItemDiscount = document.getElementById('inputItemDiscount');
+    this.inputItemStore = document.getElementById('inputItemStore');
+    this.inputItemDate = document.getElementById('inputItemDate');
+    this.quickStoreChips = document.getElementById('quickStoreChips');
     this.btnClearDiscount = document.getElementById('btnClearDiscount');
     this.discountResultCallout = document.getElementById('discountResultCallout');
     this.calloutDiscountTitle = document.getElementById('calloutDiscountTitle');
@@ -787,6 +790,17 @@ class AppController {
     // Modal Close Triggers
     this.btnItemModalClose.addEventListener('click', () => this.closeItemModal());
     this.btnModalCancel.addEventListener('click', () => this.closeItemModal());
+
+    // Quick Store Chips Listener (SRS F-01)
+    if (this.quickStoreChips) {
+      this.quickStoreChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip-store-opt');
+        if (!chip) return;
+        if (this.inputItemStore) this.inputItemStore.value = chip.dataset.store;
+        this.quickStoreChips.querySelectorAll('.chip-store-opt').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    }
     this.itemModalBackdrop.addEventListener('click', (e) => {
       if (e.target === this.itemModalBackdrop) this.closeItemModal();
     });
@@ -1095,6 +1109,7 @@ class AppController {
           <div class="item-tags-row">
             <span class="category-badge">${item.category || 'Bahan Pokok'}</span>
             <span class="unit-badge">${item.unit || 'pcs'}</span>
+            <span class="store-badge"><i data-lucide="map-pin"></i> ${item.storeLocation || 'Superindo'}</span>
           </div>
           <h4 class="item-title" title="${item.name}">${item.name}</h4>
         </div>
@@ -1191,11 +1206,15 @@ class AppController {
       this.inputItemPrice.value = item.price;
       this.inputItemQty.value = item.qty || 1;
       this.inputItemDiscount.value = item.discountRaw || '';
+      if (this.inputItemStore) this.inputItemStore.value = item.storeLocation || 'Superindo';
+      if (this.inputItemDate) this.inputItemDate.value = item.date || new Date().toISOString().split('T')[0];
       this.btnModalSubmit.innerHTML = `<i data-lucide="check"></i> Simpan Perubahan`;
     } else {
       this.itemModalTitle.textContent = 'Tambah Item Belanja';
       this.itemIdInput.value = '';
       this.inputItemQty.value = 1;
+      if (this.inputItemStore) this.inputItemStore.value = 'Superindo';
+      if (this.inputItemDate) this.inputItemDate.value = new Date().toISOString().split('T')[0];
       this.btnModalSubmit.innerHTML = `<i data-lucide="shopping-cart"></i> Simpan ke Troli`;
     }
 
@@ -1312,6 +1331,8 @@ class AppController {
     const category = this.selectItemCategory.value;
     const unit = this.selectItemUnit.value;
     const discountRaw = this.inputItemDiscount.value.trim();
+    const storeLocation = this.inputItemStore ? (this.inputItemStore.value.trim() || 'Superindo') : 'Superindo';
+    const date = this.inputItemDate && this.inputItemDate.value ? this.inputItemDate.value : new Date().toISOString().split('T')[0];
 
     if (!name) {
       alert('Mohon isi nama produk!');
@@ -1332,6 +1353,8 @@ class AppController {
         item.category = category;
         item.unit = unit;
         item.discountRaw = discountRaw;
+        item.storeLocation = storeLocation;
+        item.date = date;
         store.saveState();
         this.showToast('Item berhasil diperbarui!', 'success');
       }
@@ -1803,7 +1826,6 @@ class AppController {
     store.state.historySessions = sessions;
     store.saveState(true);
     this.renderHistorySessions();
-    this.renderHistoryAnalytics();
   }
 
   flashCloudIndicator() {

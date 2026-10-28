@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-grocery-v3';
+const CACHE_NAME = 'smart-grocery-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -28,6 +28,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('Purging legacy cache:', key);
             return caches.delete(key);
           }
         })
@@ -37,34 +38,48 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
   if (event.request.method !== 'GET') return;
-  
+
+  const url = new URL(event.request.url);
+
+  // CRITICAL: NEVER intercept Firebase, Firestore, Google APIs, or external CDNs
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // Network-First for HTML and JS logic scripts so multi-device updates apply instantly
+  const isCodeAsset = event.request.mode === 'navigate' || 
+                      url.pathname.endsWith('.js') || 
+                      url.pathname.endsWith('.html') || 
+                      url.pathname.endsWith('.json');
+
+  if (isCodeAsset) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache-First for static images, icons, and fonts
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Return cached and refresh in background
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse);
-            });
-          }
-        }).catch(() => {});
         return cachedResponse;
       }
       return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
         return networkResponse;
-      }).catch(() => {
-        // Offline fallback
-        return caches.match('./index.html');
       });
     })
   );

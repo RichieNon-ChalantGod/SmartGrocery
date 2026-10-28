@@ -26,8 +26,8 @@
   <!-- Firebase Cloud SDKs (Zero-Config Compat for PWA) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="./firebase-config.js"></script>
-  <script src="./firebase-service.js"></script>
+  <script src="./firebase-config.js?v=4"></script>
+  <script src="./firebase-service.js?v=4"></script>
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="./styles.css">
@@ -485,6 +485,38 @@
               </div>
             </div>
 
+            <!-- F-01: Lokasi Toko & Selector Tanggal (SRS F-01) -->
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label for="inputItemStore" class="input-label">
+                  <span>Lokasi Toko</span>
+                </label>
+                <div class="input-with-icon">
+                  <i data-lucide="store" class="field-icon"></i>
+                  <input type="text" id="inputItemStore" class="form-control" placeholder="Superindo / Alfamart..." value="Superindo">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="inputItemDate" class="input-label">
+                  <span>Tanggal Belanja</span>
+                </label>
+                <div class="input-with-icon">
+                  <i data-lucide="calendar" class="field-icon"></i>
+                  <input type="date" id="inputItemDate" class="form-control date-control">
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Store Chips -->
+            <div class="quick-store-chips" id="quickStoreChips">
+              <button type="button" class="chip-store-opt active" data-store="Superindo">Superindo</button>
+              <button type="button" class="chip-store-opt" data-store="Indomaret">Indomaret</button>
+              <button type="button" class="chip-store-opt" data-store="Alfamart">Alfamart</button>
+              <button type="button" class="chip-store-opt" data-store="Hypermart">Hypermart</button>
+              <button type="button" class="chip-store-opt" data-store="Pasar Tradisional">Pasar</button>
+            </div>
+
             <!-- F-01 & F-02: Harga Satuan & Realtime Price Comparator (SRS F-04) -->
             <div class="form-group">
               <div class="label-with-badge">
@@ -746,6 +778,6 @@
   </div>
 
   <!-- Main Application Logic Script -->
-  <script src="./app.js"></script>
+  <script src="./app.js?v=4"></script>
 </body>
 </html>
