@@ -2876,3 +2876,381 @@ button {
   border-color: var(--primary);
   color: #fff;
 }
+
+/* ================= PREMIUM TRIP & SCHEDULE UI ================= */
+
+/* Hero Trip Card */
+.active-session-card {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.session-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 2px;
+}
+
+.session-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+@keyframes pulseLive {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseLive 1.8s infinite ease-in-out;
+}
+
+.live-badge-label {
+  font-size: 0.64rem;
+  font-weight: 800;
+  color: #6ee7b7;
+  letter-spacing: 0.5px;
+}
+
+.session-items-count {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+/* Dual Interactive Action Tiles */
+.session-tiles-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.session-tile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.session-tile:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.tile-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.store-icon-gradient {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+}
+
+.time-icon-gradient {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(14, 165, 233, 0.35);
+}
+
+.tile-icon-box svg {
+  width: 20px;
+  height: 20px;
+}
+
+.tile-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tile-caption {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tile-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.tile-action-icon {
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tile-action-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Modal Segmented Nav Tabs */
+.modal-segmented-nav {
+  display: flex;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin: 10px 16px 6px;
+  gap: 4px;
+}
+
+.modal-seg-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modal-seg-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+}
+
+.modal-seg-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.trip-modal-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.trip-modal-panel.hidden {
+  display: none !important;
+}
+
+/* Store Options & Badges */
+.store-search-group {
+  margin-bottom: 12px;
+}
+
+.store-opt-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.store-tag-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.store-tag-badge.tag-primary {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+/* Brand specific icon colors */
+.icon-lotte { background: linear-gradient(135deg, #ef4444, #b91c1c) !important; color: #fff !important; }
+.icon-superindo { background: linear-gradient(135deg, #f97316, #ea580c) !important; color: #fff !important; }
+.icon-indomaret { background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important; color: #fff !important; }
+.icon-alfamart { background: linear-gradient(135deg, #dc2626, #991b1b) !important; color: #fff !important; }
+.icon-hypermart { background: linear-gradient(135deg, #2563eb, #1e40af) !important; color: #fff !important; }
+.icon-grandlucky { background: linear-gradient(135deg, #eab308, #ca8a04) !important; color: #fff !important; }
+.icon-farmers { background: linear-gradient(135deg, #10b981, #047857) !important; color: #fff !important; }
+.icon-aeon { background: linear-gradient(135deg, #ec4899, #be185d) !important; color: #fff !important; }
+.icon-pasar { background: linear-gradient(135deg, #84cc16, #4d7c0f) !important; color: #fff !important; }
+
+/* Quick Date Grid Cards */
+.schedule-section-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.quick-date-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.date-card-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.date-card-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.date-card-btn.active {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.date-card-day {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.date-card-date {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 2px 0;
+  font-family: var(--font-mono);
+}
+
+.date-card-btn.active .date-card-date {
+  color: #6ee7b7;
+}
+
+.date-card-sub {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+}
+
+/* Day Periods Grid */
+.day-period-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.period-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.period-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.period-btn.active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+.period-btn.btn-now {
+  grid-column: span 2;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.period-btn.btn-now.active {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: var(--primary);
+}
+
+.period-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.period-texts {
+  display: flex;
+  flex-direction: column;
+}
+
+.period-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.period-clock {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.modal-footer-sticky {
+  position: sticky;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(8px);
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}

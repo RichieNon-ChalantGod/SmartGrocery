@@ -150,6 +150,19 @@ const store = new GroceryStore();
 /**
  * Format currency to Indonesian Rupiah standard format
  */
+function getDayPeriodDescription(timeStr) {
+  if (!timeStr) return 'Sesi Belanja';
+  try {
+    const hour = parseInt(timeStr.split(':')[0], 10);
+    if (hour >= 5 && hour < 11) return '🌅 Sesi Pagi Hari';
+    if (hour >= 11 && hour < 15) return '☀️ Sesi Siang Hari';
+    if (hour >= 15 && hour < 18) return '🌇 Sesi Sore Hari';
+    return '🌙 Sesi Malam Hari';
+  } catch (e) {
+    return 'Sesi Belanja';
+  }
+}
+
 function formatIndonesianDateTime(dateStr, timeStr) {
   if (!dateStr) return '';
   try {
@@ -580,6 +593,16 @@ class AppController {
     this.quickTimeChips = document.getElementById('quickTimeChips');
     this.datetimePreviewText = document.getElementById('datetimePreviewText');
     this.storeCategoryTabs = document.getElementById('storeCategoryTabs');
+    this.segTabStore = document.getElementById('segTabStore');
+    this.segTabSchedule = document.getElementById('segTabSchedule');
+    this.panelTripStore = document.getElementById('panelTripStore');
+    this.panelTripSchedule = document.getElementById('panelTripSchedule');
+    this.quickDateGrid = document.getElementById('quickDateGrid');
+    this.dayPeriodGrid = document.getElementById('dayPeriodGrid');
+    this.displayActiveTimeDesc = document.getElementById('displayActiveTimeDesc');
+    this.sessionActiveCount = document.getElementById('sessionActiveCount');
+    this.periodLiveClock = document.getElementById('periodLiveClock');
+    this.btnClearStoreSearch = document.getElementById('btnClearStoreSearch');
     this.checkoutModalStore = document.getElementById('checkoutModalStore');
     this.displayActiveStore = document.getElementById('displayActiveStore');
     this.activeTripDatePicker = document.getElementById('activeTripDatePicker');
@@ -829,13 +852,68 @@ class AppController {
 
     // Store Location Selector Modal (SRS F-01)
     if (this.btnEditTripStore) {
-      this.btnEditTripStore.addEventListener('click', () => this.openStoreModal());
+      this.btnEditTripStore.addEventListener('click', () => this.openStoreModal('store'));
     }
     if (this.btnEditTripTime) {
-      this.btnEditTripTime.addEventListener('click', () => this.openStoreModal());
+      this.btnEditTripTime.addEventListener('click', () => this.openStoreModal('schedule'));
     }
     if (this.btnMoreStores) {
-      this.btnMoreStores.addEventListener('click', () => this.openStoreModal());
+      this.btnMoreStores.addEventListener('click', () => this.openStoreModal('store'));
+    }
+
+    // Modal Navigation Segmented Control
+    if (this.segTabStore) {
+      this.segTabStore.addEventListener('click', () => this.switchTripModalTab('store'));
+    }
+    if (this.segTabSchedule) {
+      this.segTabSchedule.addEventListener('click', () => this.switchTripModalTab('schedule'));
+    }
+
+    // Quick Date Cards Grid in Modal
+    if (this.quickDateGrid) {
+      this.quickDateGrid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.date-card-btn');
+        if (!btn) return;
+        const offset = btn.dataset.dateOffset;
+        const targetDate = new Date();
+        if (offset === '1') {
+          targetDate.setDate(targetDate.getDate() + 1);
+        } else if (offset === '2') {
+          targetDate.setDate(targetDate.getDate() + 2);
+        } else if (offset === 'weekend') {
+          // Nearest Saturday
+          const day = targetDate.getDay();
+          const diff = (6 - day + 7) % 7 || 7;
+          targetDate.setDate(targetDate.getDate() + diff);
+        }
+        
+        const y = targetDate.getFullYear();
+        const m = String(targetDate.getMonth() + 1).padStart(2, '0');
+        const d = String(targetDate.getDate()).padStart(2, '0');
+        const formatted = `${y}-${m}-${d}`;
+        
+        if (this.tripModalDateInput) this.tripModalDateInput.value = formatted;
+        this.quickDateGrid.querySelectorAll('.date-card-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateModalDateTimePreview();
+      });
+    }
+
+    // Day Periods Grid in Modal
+    if (this.dayPeriodGrid) {
+      this.dayPeriodGrid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.period-btn');
+        if (!btn) return;
+        let chosen = btn.dataset.time;
+        if (chosen === 'now') {
+          const now = new Date();
+          chosen = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        }
+        if (this.tripModalTimeInput) this.tripModalTimeInput.value = chosen;
+        this.dayPeriodGrid.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateModalDateTimePreview();
+      });
     }
 
     // Time & Date change in modal
