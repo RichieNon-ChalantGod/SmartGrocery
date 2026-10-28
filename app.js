@@ -150,6 +150,22 @@ const store = new GroceryStore();
 /**
  * Format currency to Indonesian Rupiah standard format
  */
+function formatIndonesianDateTime(dateStr, timeStr) {
+  if (!dateStr) return '';
+  try {
+    const parts = dateStr.split('-').map(Number);
+    if (parts.length === 3) {
+      const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      const dayName = days[dateObj.getDay()];
+      const monthName = months[dateObj.getMonth()];
+      return `${dayName}, ${parts[2]} ${monthName} ${parts[0]} • ${timeStr || '11:45'} WIB`;
+    }
+  } catch (e) {}
+  return `${dateStr} • ${timeStr || ''}`;
+}
+
 function formatRupiah(amount) {
   if (amount === undefined || amount === null || isNaN(amount)) return 'Rp 0';
   return 'Rp ' + Math.round(amount).toLocaleString('id-ID');
@@ -556,6 +572,14 @@ class AppController {
     this.btnStoreModalApply = document.getElementById('btnStoreModalApply');
     this.customStoreInput = document.getElementById('customStoreInput');
     this.storeOptionsList = document.getElementById('storeOptionsList');
+    this.displayActiveDateTime = document.getElementById('displayActiveDateTime');
+    this.btnEditTripTime = document.getElementById('btnEditTripTime');
+    this.btnMoreStores = document.getElementById('btnMoreStores');
+    this.tripModalDateInput = document.getElementById('tripModalDateInput');
+    this.tripModalTimeInput = document.getElementById('tripModalTimeInput');
+    this.quickTimeChips = document.getElementById('quickTimeChips');
+    this.datetimePreviewText = document.getElementById('datetimePreviewText');
+    this.storeCategoryTabs = document.getElementById('storeCategoryTabs');
     this.checkoutModalStore = document.getElementById('checkoutModalStore');
     this.displayActiveStore = document.getElementById('displayActiveStore');
     this.activeTripDatePicker = document.getElementById('activeTripDatePicker');
@@ -807,6 +831,66 @@ class AppController {
     if (this.btnEditTripStore) {
       this.btnEditTripStore.addEventListener('click', () => this.openStoreModal());
     }
+    if (this.btnEditTripTime) {
+      this.btnEditTripTime.addEventListener('click', () => this.openStoreModal());
+    }
+    if (this.btnMoreStores) {
+      this.btnMoreStores.addEventListener('click', () => this.openStoreModal());
+    }
+
+    // Time & Date change in modal
+    const updateModalDateTimePreview = () => {
+      const d = this.tripModalDateInput ? this.tripModalDateInput.value : store.state.activeDate;
+      const t = this.tripModalTimeInput ? this.tripModalTimeInput.value : store.state.activeTime;
+      if (this.datetimePreviewText) {
+        this.datetimePreviewText.textContent = `Jadwal: ${formatIndonesianDateTime(d, t)}`;
+      }
+    };
+
+    if (this.tripModalDateInput) {
+      this.tripModalDateInput.addEventListener('change', updateModalDateTimePreview);
+    }
+    if (this.tripModalTimeInput) {
+      this.tripModalTimeInput.addEventListener('change', updateModalDateTimePreview);
+    }
+
+    // Quick Time Presets
+    if (this.quickTimeChips) {
+      this.quickTimeChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip-time-opt');
+        if (!chip) return;
+        let chosenTime = chip.dataset.time;
+        if (chosenTime === 'now') {
+          const now = new Date();
+          chosenTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        }
+        if (this.tripModalTimeInput) this.tripModalTimeInput.value = chosenTime;
+        this.quickTimeChips.querySelectorAll('.chip-time-opt').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        updateModalDateTimePreview();
+      });
+    }
+
+    // Store Category Filter Tabs
+    if (this.storeCategoryTabs) {
+      this.storeCategoryTabs.addEventListener('click', (e) => {
+        const tab = e.target.closest('.store-tab-btn');
+        if (!tab) return;
+        const cat = tab.dataset.storeCat;
+        this.storeCategoryTabs.querySelectorAll('.store-tab-btn').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        if (this.storeOptionsList) {
+          this.storeOptionsList.querySelectorAll('.store-option-card').forEach(card => {
+            if (cat === 'all' || card.dataset.storeCat === cat) {
+              card.style.display = 'flex';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        }
+      });
+    }
     if (this.btnStoreModalClose) {
       this.btnStoreModalClose.addEventListener('click', () => this.closeStoreModal());
     }
@@ -825,6 +909,12 @@ class AppController {
         this.storeOptionsList.querySelectorAll('.store-option-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         if (this.customStoreInput) this.customStoreInput.value = '';
+    
+    if (this.tripModalDateInput) this.tripModalDateInput.value = store.state.activeDate || '2026-10-28';
+    if (this.tripModalTimeInput) this.tripModalTimeInput.value = store.state.activeTime || '11:45';
+    if (this.datetimePreviewText) {
+      this.datetimePreviewText.textContent = `Jadwal: ${formatIndonesianDateTime(store.state.activeDate, store.state.activeTime)}`;
+    }
         // Immediate selection on tap
         this.applyStoreSelection(card.dataset.store);
       });
@@ -1544,7 +1634,24 @@ class AppController {
     if (!storeName || !storeName.trim()) return;
     const cleanName = storeName.trim();
     
+    const newDate = this.tripModalDateInput && this.tripModalDateInput.value ? this.tripModalDateInput.value : (store.state.activeDate || '2026-10-28');
+    const newTime = this.tripModalTimeInput && this.tripModalTimeInput.value ? this.tripModalTimeInput.value : (store.state.activeTime || '11:45');
+    
     store.state.activeStore = cleanName;
+    store.state.activeDate = newDate;
+    store.state.activeTime = newTime;
+
+    if (Array.isArray(store.state.cart)) {
+      store.state.cart.forEach(item => {
+        item.storeLocation = cleanName;
+        item.date = newDate;
+        item.time = newTime;
+      });
+    }
+
+    if (this.displayActiveDateTime) {
+      this.displayActiveDateTime.textContent = formatIndonesianDateTime(newDate, newTime);
+    }
     if (Array.isArray(store.state.cart)) {
       store.state.cart.forEach(item => item.storeLocation = cleanName);
     }

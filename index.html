@@ -137,33 +137,40 @@
         <section class="view-panel active" id="viewBelanja">
           
           <!-- Category Filter Bar (Ergonomic Horizontal Scroll) -->
-          <!-- Active Shopping Session Meta: Lokasi Toko & Selector Tanggal (SRS F-01) -->
-          <div class="active-session-strip" id="activeSessionStrip">
-            <div class="session-store-pill" id="btnEditTripStore" role="button" tabindex="0" title="Klik untuk ubah lokasi belanja semua barang">
-              <i data-lucide="store" class="pill-icon text-primary"></i>
-              <div class="pill-content">
-                <span class="pill-caption">Lokasi Belanja (Semua Barang):</span>
-                <span class="pill-value" id="displayActiveStore">Lotte Mart Grocery - Puri Indah</span>
-              </div>
-              <span class="badge-edit-pill"><i data-lucide="pencil"></i> Ubah</span>
-            </div>
-
-            <div class="session-date-picker-wrap">
-              <i data-lucide="calendar" class="pill-icon text-secondary"></i>
-              <div class="pill-content">
-                <label for="activeTripDatePicker" class="pill-caption">Tanggal Belanja:</label>
-                <input type="date" id="activeTripDatePicker" class="session-date-input" value="2026-10-28">
+          <!-- Active Shopping Session Card: Lokasi Belanja & Waktu Belanja Fleksibel (SRS F-01) -->
+          <div class="active-session-card" id="activeSessionCard">
+            <div class="session-card-header">
+              <div class="session-store-pill" id="btnEditTripStore" role="button" tabindex="0" title="Klik untuk ubah lokasi belanja semua barang">
+                <div class="store-icon-wrap"><i data-lucide="store" class="pill-icon text-primary"></i></div>
+                <div class="pill-content">
+                  <span class="pill-caption">Supermarket Sesi Ini:</span>
+                  <span class="pill-value" id="displayActiveStore">Lotte Mart Grocery - Puri Indah</span>
+                </div>
+                <span class="badge-edit-pill"><i data-lucide="pencil"></i> Ubah Lokasi</span>
               </div>
             </div>
-          </div>
 
-          <!-- Quick Store Switcher for Entire Session (SRS F-01) -->
-          <div class="quick-store-chips session-chips" id="quickStoreChips">
-            <button type="button" class="chip-store-opt active" data-store="Lotte Mart Grocery - Puri Indah">Lotte Mart - Puri Indah</button>
-            <button type="button" class="chip-store-opt" data-store="Superindo">Superindo</button>
-            <button type="button" class="chip-store-opt" data-store="Indomaret">Indomaret</button>
-            <button type="button" class="chip-store-opt" data-store="Alfamart">Alfamart</button>
-            <button type="button" class="chip-store-opt" data-store="Pasar Tradisional">Pasar</button>
+            <div class="session-time-row" id="btnEditTripTime" role="button" tabindex="0" title="Klik untuk ubah tanggal & jam belanja">
+              <div class="session-datetime-meta">
+                <i data-lucide="calendar-clock" class="meta-icon text-secondary"></i>
+                <div class="datetime-texts">
+                  <span class="meta-caption">Waktu & Jadwal Belanja:</span>
+                  <span class="meta-val" id="displayActiveDateTime">Rabu, 28 Okt 2026 • 11:45 WIB</span>
+                </div>
+              </div>
+              <span class="badge-edit-pill"><i data-lucide="clock"></i> Ubah Waktu</span>
+            </div>
+
+            <!-- Quick Store Switcher for Entire Session (SRS F-01) -->
+            <div class="quick-store-chips session-chips" id="quickStoreChips">
+              <button type="button" class="chip-store-opt active" data-store="Lotte Mart Grocery - Puri Indah">🏬 Lotte Mart - Puri Indah</button>
+              <button type="button" class="chip-store-opt" data-store="Superindo">🛒 Superindo</button>
+              <button type="button" class="chip-store-opt" data-store="Indomaret">🏪 Indomaret</button>
+              <button type="button" class="chip-store-opt" data-store="Alfamart">🏷️ Alfamart</button>
+              <button type="button" class="chip-store-opt" data-store="Hypermart">🏢 Hypermart</button>
+              <button type="button" class="chip-store-opt" data-store="Pasar Tradisional">🥬 Pasar</button>
+              <button type="button" class="chip-store-opt chip-more-stores" id="btnMoreStores">+ Opsi Toko Lain</button>
+            </div>
           </div>
 
           <div class="category-filter-strip" id="categoryFilterStrip">
@@ -637,15 +644,15 @@
         </div>
       </div>
 
-      <!-- ================= MODAL: PILIH LOKASI BELANJA (SUPERMARKET SELECTOR) ================= -->
+      <!-- ================= MODAL: ATUR LOKASI & WAKTU BELANJA (SRS F-01) ================= -->
       <div class="modal-backdrop hidden" id="storeModalBackdrop">
-        <div class="modal-bottom-sheet" id="storeModalSheet">
+        <div class="modal-bottom-sheet modal-trip-sheet" id="storeModalSheet">
           <div class="sheet-grabber"></div>
           
           <div class="sheet-header">
             <div class="sheet-title-wrap">
-              <h3 class="sheet-title">Pilih Lokasi Belanja</h3>
-              <span class="sheet-subtitle">Tentukan supermarket untuk seluruh belanjaan sesi ini</span>
+              <h3 class="sheet-title">Atur Lokasi & Waktu Belanja</h3>
+              <span class="sheet-subtitle">Pilih supermarket dan jadwal belanja untuk seluruh troli</span>
             </div>
             <button class="sheet-close-btn" id="btnStoreModalClose" aria-label="Tutup Modal">
               <i data-lucide="x"></i>
@@ -653,85 +660,160 @@
           </div>
 
           <div class="store-modal-body">
-            <!-- Custom store input -->
-            <div class="form-group">
-              <label for="customStoreInput" class="input-label">Cari atau Ketik Nama Toko</label>
-              <div class="input-with-icon">
-                <i data-lucide="search" class="field-icon"></i>
-                <input type="text" id="customStoreInput" class="form-control" placeholder="Ketik nama supermarket / toko lain...">
+            
+            <!-- SECTION 1: WAKTU & JADWAL BELANJA -->
+            <div class="modal-section-box">
+              <div class="section-box-header">
+                <i data-lucide="calendar-clock" class="text-secondary"></i>
+                <span class="section-box-title">Waktu & Jadwal Belanja</span>
+              </div>
+              
+              <div class="form-row-2col">
+                <div class="form-group">
+                  <label for="tripModalDateInput" class="input-label">Pilih Tanggal</label>
+                  <div class="input-with-icon">
+                    <i data-lucide="calendar" class="field-icon"></i>
+                    <input type="date" id="tripModalDateInput" class="form-control date-control" value="2026-10-28">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="tripModalTimeInput" class="input-label">Pilih Jam</label>
+                  <div class="input-with-icon">
+                    <i data-lucide="clock" class="field-icon"></i>
+                    <input type="time" id="tripModalTimeInput" class="form-control time-control" value="11:45">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Time Preset Chips -->
+              <div class="quick-time-chips" id="quickTimeChips">
+                <button type="button" class="chip-time-opt" data-time="09:00">🌅 Pagi (09:00)</button>
+                <button type="button" class="chip-time-opt" data-time="13:00">☀️ Siang (13:00)</button>
+                <button type="button" class="chip-time-opt" data-time="17:00">🌇 Sore (17:00)</button>
+                <button type="button" class="chip-time-opt" data-time="20:00">🌙 Malam (20:00)</button>
+                <button type="button" class="chip-time-opt active" data-time="now">⚡ Jam Sekarang</button>
+              </div>
+
+              <div class="datetime-preview-banner" id="datetimePreviewBanner">
+                <i data-lucide="check-circle" class="preview-icon text-success"></i>
+                <span id="datetimePreviewText">Jadwal: Rabu, 28 Oktober 2026 pukul 11:45 WIB</span>
               </div>
             </div>
 
-            <!-- List of Supermarkets -->
-            <div class="store-options-list" id="storeOptionsList">
-              <div class="store-option-card active" data-store="Lotte Mart Grocery - Puri Indah">
-                <div class="store-opt-icon"><i data-lucide="store"></i></div>
-                <div class="store-opt-info">
-                  <div class="store-opt-name">Lotte Mart Grocery - Puri Indah</div>
-                  <div class="store-opt-desc">Supermarket Pilihan Utama • Jakarta Barat</div>
-                </div>
-                <div class="store-opt-check"><i data-lucide="check"></i></div>
+            <!-- SECTION 2: PILIHAN LOKASI TOKO / SUPERMARKET -->
+            <div class="modal-section-box">
+              <div class="section-box-header">
+                <i data-lucide="store" class="text-primary"></i>
+                <span class="section-box-title">Pilih Supermarket / Toko</span>
               </div>
 
-              <div class="store-option-card" data-store="Superindo">
-                <div class="store-opt-icon"><i data-lucide="shopping-bag"></i></div>
-                <div class="store-opt-info">
-                  <div class="store-opt-name">Superindo</div>
-                  <div class="store-opt-desc">Supermarket Segar & Hemat Bulanan</div>
-                </div>
-                <div class="store-opt-check"><i data-lucide="check"></i></div>
+              <!-- Store Category Filter Tabs -->
+              <div class="store-filter-tabs" id="storeCategoryTabs">
+                <button type="button" class="store-tab-btn active" data-store-cat="all">Semua Toko</button>
+                <button type="button" class="store-tab-btn" data-store-cat="supermarket">Supermarket</button>
+                <button type="button" class="store-tab-btn" data-store-cat="minimarket">Minimarket</button>
+                <button type="button" class="store-tab-btn" data-store-cat="hypermarket">Hypermarket</button>
+                <button type="button" class="store-tab-btn" data-store-cat="pasar">Pasar</button>
               </div>
 
-              <div class="store-option-card" data-store="Indomaret">
-                <div class="store-opt-icon"><i data-lucide="shopping-cart"></i></div>
-                <div class="store-opt-info">
-                  <div class="store-opt-name">Indomaret</div>
-                  <div class="store-opt-desc">Minimarket Dekat Kos / Kampus</div>
+              <!-- Search or Custom Store Name -->
+              <div class="form-group" style="margin-bottom: 10px;">
+                <div class="input-with-icon">
+                  <i data-lucide="search" class="field-icon"></i>
+                  <input type="text" id="customStoreInput" class="form-control" placeholder="Cari atau ketik nama toko kustom...">
                 </div>
-                <div class="store-opt-check"><i data-lucide="check"></i></div>
               </div>
 
-              <div class="store-option-card" data-store="Alfamart">
-                <div class="store-opt-icon"><i data-lucide="tag"></i></div>
-                <div class="store-opt-info">
-                  <div class="store-opt-name">Alfamart</div>
-                  <div class="store-opt-desc">Minimarket & Promo Hemat Belanja Harian</div>
+              <!-- List of Supermarkets with badges -->
+              <div class="store-options-list" id="storeOptionsList">
+                <div class="store-option-card active" data-store="Lotte Mart Grocery - Puri Indah" data-store-cat="supermarket">
+                  <div class="store-opt-icon"><i data-lucide="store"></i></div>
+                  <div class="store-opt-info">
+                    <div class="store-opt-name">Lotte Mart Grocery - Puri Indah</div>
+                    <div class="store-opt-desc">Mall Puri Indah, Kembangan • Pilihan Utama</div>
+                  </div>
+                  <div class="store-opt-check"><i data-lucide="check"></i></div>
                 </div>
-                <div class="store-opt-check"><i data-lucide="check"></i></div>
-              </div>
 
-              <div class="store-option-card" data-store="Hypermart">
-                <div class="store-opt-icon"><i data-lucide="building"></i></div>
-                <div class="store-opt-info">
-                  <div class="store-opt-name">Hypermart</div>
-                  <div class="store-opt-desc">Hypermarket Lengkap untuk Stok Bulanan</div>
+                <div class="store-option-card" data-store="Superindo" data-store-cat="supermarket">
+                  <div class="store-opt-icon"><i data-lucide="shopping-bag"></i></div>
+                  <div class="store-opt-info">
+                    <div class="store-opt-name">Superindo</div>
+                    <div class="store-opt-desc">Supermarket Segar & Promo Hemat</div>
+                  </div>
+                  <div class="store-opt-check"><i data-lucide="check"></i></div>
                 </div>
-                <div class="store-opt-check"><i data-lucide="check"></i></div>
-              </div>
 
-              <div class="store-option-card" data-store="Grand Lucky">
-                <div class="store-opt-icon"><i data-lucide="gem"></i></div>
-                <div class="store-opt-info">
-                  <div class="store-opt-name">Grand Lucky Superstore</div>
-                  <div class="store-opt-desc">Supermarket Premium & Import</div>
+                <div class="store-option-card" data-store="Indomaret" data-store-cat="minimarket">
+                  <div class="store-opt-icon"><i data-lucide="shopping-cart"></i></div>
+                  <div class="store-opt-info">
+                    <div class="store-opt-name">Indomaret</div>
+                    <div class="store-opt-desc">Minimarket Dekat Kos / Kampus</div>
+                  </div>
+                  <div class="store-opt-check"><i data-lucide="check"></i></div>
                 </div>
-                <div class="store-opt-check"><i data-lucide="check"></i></div>
-              </div>
 
-              <div class="store-option-card" data-store="Pasar Tradisional">
-                <div class="store-opt-icon"><i data-lucide="carrot"></i></div>
-                <div class="store-opt-info">
-                  <div class="store-opt-name">Pasar Tradisional</div>
-                  <div class="store-opt-desc">Sayur, Bumbu, & Lauk Harga Grosir</div>
+                <div class="store-option-card" data-store="Alfamart" data-store-cat="minimarket">
+                  <div class="store-opt-icon"><i data-lucide="tag"></i></div>
+                  <div class="store-opt-info">
+                    <div class="store-opt-name">Alfamart</div>
+                    <div class="store-opt-desc">Minimarket & Promo Hemat Belanja Harian</div>
+                  </div>
+                  <div class="store-opt-check"><i data-lucide="check"></i></div>
                 </div>
-                <div class="store-opt-check"><i data-lucide="check"></i></div>
+
+                <div class="store-option-card" data-store="Hypermart" data-store-cat="hypermarket">
+                  <div class="store-opt-icon"><i data-lucide="building"></i></div>
+                  <div class="store-opt-info">
+                    <div class="store-opt-name">Hypermart</div>
+                    <div class="store-opt-desc">Hypermarket Lengkap untuk Belanja Bulanan</div>
+                  </div>
+                  <div class="store-opt-check"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="store-option-card" data-store="Grand Lucky" data-store-cat="supermarket">
+                  <div class="store-opt-icon"><i data-lucide="gem"></i></div>
+                  <div class="store-opt-info">
+                    <div class="store-opt-name">Grand Lucky Superstore</div>
+                    <div class="store-opt-desc">Supermarket Premium, Buah & Produk Import</div>
+                  </div>
+                  <div class="store-opt-check"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="store-option-card" data-store="Farmers Market" data-store-cat="supermarket">
+                  <div class="store-opt-icon"><i data-lucide="apple"></i></div>
+                  <div class="store-opt-info">
+                    <div class="store-opt-name">Farmers Market</div>
+                    <div class="store-opt-desc">Produk Organik & Makanan Segar Berkualitas</div>
+                  </div>
+                  <div class="store-opt-check"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="store-option-card" data-store="AEON Store" data-store-cat="hypermarket">
+                  <div class="store-opt-icon"><i data-lucide="utensils"></i></div>
+                  <div class="store-opt-info">
+                    <div class="store-opt-name">AEON Store</div>
+                    <div class="store-opt-desc">Supermarket, Bakery & Masakan Siap Santap</div>
+                  </div>
+                  <div class="store-opt-check"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="store-option-card" data-store="Pasar Tradisional" data-store-cat="pasar">
+                  <div class="store-opt-icon"><i data-lucide="carrot"></i></div>
+                  <div class="store-opt-info">
+                    <div class="store-opt-name">Pasar Tradisional</div>
+                    <div class="store-opt-desc">Bumbu Dapur, Sayur, & Lauk Harga Grosir</div>
+                  </div>
+                  <div class="store-opt-check"><i data-lucide="check"></i></div>
+                </div>
               </div>
             </div>
 
             <div class="sheet-actions">
               <button type="button" class="btn-cancel-mobile" id="btnStoreModalCancel">Batal</button>
               <button type="button" class="btn-submit-mobile" id="btnStoreModalApply">
-                <i data-lucide="check"></i> Terapkan ke Semua Item
+                <i data-lucide="check-check"></i> Simpan & Terapkan ke Semua Item
               </button>
             </div>
           </div>
