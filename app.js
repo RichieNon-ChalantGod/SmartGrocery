@@ -547,7 +547,16 @@ class AppController {
     this.inputItemDiscount = document.getElementById('inputItemDiscount');
     this.inputItemStore = document.getElementById('inputItemStore');
     this.inputItemDate = document.getElementById('inputItemDate');
-    this.quickStoreChips = document.getElementById('quickStoreChips');
+    this.modalTripStoreName = document.getElementById('modalTripStoreName');
+    this.modalTripDateVal = document.getElementById('modalTripDateVal');
+    this.btnEditTripStore = document.getElementById('btnEditTripStore');
+    this.storeModalBackdrop = document.getElementById('storeModalBackdrop');
+    this.btnStoreModalClose = document.getElementById('btnStoreModalClose');
+    this.btnStoreModalCancel = document.getElementById('btnStoreModalCancel');
+    this.btnStoreModalApply = document.getElementById('btnStoreModalApply');
+    this.customStoreInput = document.getElementById('customStoreInput');
+    this.storeOptionsList = document.getElementById('storeOptionsList');
+    this.checkoutModalStore = document.getElementById('checkoutModalStore');
     this.displayActiveStore = document.getElementById('displayActiveStore');
     this.activeTripDatePicker = document.getElementById('activeTripDatePicker');
     this.btnClearDiscount = document.getElementById('btnClearDiscount');
@@ -793,6 +802,86 @@ class AppController {
     this.btnItemModalClose.addEventListener('click', () => this.closeItemModal());
     this.btnModalCancel.addEventListener('click', () => this.closeItemModal());
 
+
+    // Store Location Selector Modal (SRS F-01)
+    if (this.btnEditTripStore) {
+      this.btnEditTripStore.addEventListener('click', () => this.openStoreModal());
+    }
+    if (this.btnStoreModalClose) {
+      this.btnStoreModalClose.addEventListener('click', () => this.closeStoreModal());
+    }
+    if (this.btnStoreModalCancel) {
+      this.btnStoreModalCancel.addEventListener('click', () => this.closeStoreModal());
+    }
+    if (this.storeModalBackdrop) {
+      this.storeModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.storeModalBackdrop) this.closeStoreModal();
+      });
+    }
+    if (this.storeOptionsList) {
+      this.storeOptionsList.addEventListener('click', (e) => {
+        const card = e.target.closest('.store-option-card');
+        if (!card) return;
+        this.storeOptionsList.querySelectorAll('.store-option-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        if (this.customStoreInput) this.customStoreInput.value = '';
+        // Immediate selection on tap
+        this.applyStoreSelection(card.dataset.store);
+      });
+    }
+    if (this.btnStoreModalApply) {
+      this.btnStoreModalApply.addEventListener('click', () => {
+        const customVal = this.customStoreInput ? this.customStoreInput.value.trim() : '';
+        if (customVal) {
+          this.applyStoreSelection(customVal);
+          return;
+        }
+        const activeCard = this.storeOptionsList ? this.storeOptionsList.querySelector('.store-option-card.active') : null;
+        if (activeCard) {
+          this.applyStoreSelection(activeCard.dataset.store);
+        } else {
+          this.closeStoreModal();
+        }
+      });
+    }
+    if (this.customStoreInput) {
+      this.customStoreInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (this.storeOptionsList) {
+          this.storeOptionsList.querySelectorAll('.store-option-card').forEach(card => {
+            const name = (card.dataset.store || '').toLowerCase();
+            const desc = (card.querySelector('.store-opt-desc') ? card.querySelector('.store-opt-desc').textContent : '').toLowerCase();
+            if (!query || name.includes(query) || desc.includes(query)) {
+              card.style.display = 'flex';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        }
+      });
+    }
+
+    // Edit Trip Store Location for all items (SRS F-01)
+    if (this.btnEditTripStore) {
+      this.btnEditTripStore.addEventListener('click', () => {
+        const currentStore = store.state.activeStore || 'Lotte Mart Grocery - Puri Indah';
+        const newStore = prompt('Ubah lokasi belanja supermarket untuk semua barang sesi ini:', currentStore);
+        if (newStore && newStore.trim() && newStore.trim() !== currentStore) {
+          const val = newStore.trim();
+          store.state.activeStore = val;
+          if (Array.isArray(store.state.cart)) {
+            store.state.cart.forEach(item => item.storeLocation = val);
+          }
+          store.saveState();
+          if (window.firebaseSyncService) {
+            window.firebaseSyncService.syncSettingsNow({ activeStore: val });
+          }
+          this.renderAll();
+          this.showToast(`Lokasi belanja semua barang disetel ke ${val}`, 'success');
+        }
+      });
+    }
+
     // Active Trip Date Picker Listener (SRS F-01)
     if (this.activeTripDatePicker) {
       this.activeTripDatePicker.addEventListener('change', (e) => {
@@ -813,14 +902,26 @@ class AppController {
       });
     }
 
-    // Quick Store Chips Listener (SRS F-01)
+    // Quick Store Chips Listener for Entire Shopping Session (SRS F-01)
     if (this.quickStoreChips) {
       this.quickStoreChips.addEventListener('click', (e) => {
         const chip = e.target.closest('.chip-store-opt');
         if (!chip) return;
-        if (this.inputItemStore) this.inputItemStore.value = chip.dataset.store;
+        const newStore = chip.dataset.store;
+        store.state.activeStore = newStore;
+        if (this.inputItemStore) this.inputItemStore.value = newStore;
+        if (this.displayActiveStore) this.displayActiveStore.textContent = newStore;
+        if (this.modalTripStoreName) this.modalTripStoreName.textContent = newStore;
+        if (Array.isArray(store.state.cart)) {
+          store.state.cart.forEach(item => item.storeLocation = newStore);
+        }
+        store.saveState();
+        if (window.firebaseSyncService) {
+          window.firebaseSyncService.syncSettingsNow({ activeStore: newStore });
+        }
         this.quickStoreChips.querySelectorAll('.chip-store-opt').forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
+        this.showToast(`Lokasi belanja semua barang disetel ke: ${newStore}`, 'success');
       });
     }
     this.itemModalBackdrop.addEventListener('click', (e) => {
@@ -873,6 +974,14 @@ class AppController {
         const disc = e.currentTarget.dataset.disc;
         this.inputItemDiscount.value = disc === '0' ? '' : disc;
         this.handleModalDiscountChange();
+
+    if (this.modalTripStoreName) {
+      this.modalTripStoreName.textContent = store.state.activeStore || 'Lotte Mart Grocery - Puri Indah';
+    }
+    if (this.modalTripDateVal) {
+      this.modalTripDateVal.textContent = store.state.activeDate || '2026-10-28';
+    }
+
       });
     });
     this.btnClearDiscount.addEventListener('click', () => {
@@ -1131,7 +1240,7 @@ class AppController {
           <div class="item-tags-row">
             <span class="category-badge">${item.category || 'Bahan Pokok'}</span>
             <span class="unit-badge">${item.unit || 'pcs'}</span>
-            <span class="store-badge"><i data-lucide="map-pin"></i> ${item.storeLocation || 'Superindo'}</span>
+            
           </div>
           <h4 class="item-title" title="${item.name}">${item.name}</h4>
         </div>
@@ -1401,6 +1510,69 @@ class AppController {
 
     this.closeItemModal();
     this.renderAll();
+  }
+
+  // ================= STORE SELECTOR MODAL (SRS F-01) =================
+  openStoreModal() {
+    if (!this.storeModalBackdrop) return;
+    const currentStore = store.state.activeStore || 'Lotte Mart Grocery - Puri Indah';
+    
+    if (this.customStoreInput) this.customStoreInput.value = '';
+    
+    if (this.storeOptionsList) {
+      this.storeOptionsList.querySelectorAll('.store-option-card').forEach(card => {
+        card.style.display = 'flex';
+        if (card.dataset.store.toLowerCase() === currentStore.toLowerCase()) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+    }
+
+    this.storeModalBackdrop.classList.remove('hidden');
+    this.refreshIcons();
+  }
+
+  closeStoreModal() {
+    if (this.storeModalBackdrop) {
+      this.storeModalBackdrop.classList.add('hidden');
+    }
+  }
+
+  applyStoreSelection(storeName) {
+    if (!storeName || !storeName.trim()) return;
+    const cleanName = storeName.trim();
+    
+    store.state.activeStore = cleanName;
+    if (Array.isArray(store.state.cart)) {
+      store.state.cart.forEach(item => item.storeLocation = cleanName);
+    }
+    
+    if (this.displayActiveStore) this.displayActiveStore.textContent = cleanName;
+    if (this.modalTripStoreName) this.modalTripStoreName.textContent = cleanName;
+    if (this.inputItemStore) this.inputItemStore.value = cleanName;
+    
+    // Update quick chips active state if matching
+    if (this.quickStoreChips) {
+      this.quickStoreChips.querySelectorAll('.chip-store-opt').forEach(chip => {
+        if (chip.dataset.store.toLowerCase() === cleanName.toLowerCase()) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+    }
+
+    store.saveState();
+    if (window.firebaseSyncService) {
+      window.firebaseSyncService.syncSettingsNow({ activeStore: cleanName });
+    }
+
+    this.closeStoreModal();
+    this.renderAll();
+    this.showToast(`🏬 Lokasi belanja diatur ke: ${cleanName}`, 'success');
+    audioEngine.playSuccess();
   }
 
   // ================= QUICK BUDGET MODAL =================

@@ -2494,3 +2494,138 @@ button {
   filter: invert(1);
   cursor: pointer;
 }
+
+/* Trip info badge in modal */
+.trip-info-badge-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+.trip-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.trip-badge-item svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.trip-badge-texts {
+  display: flex;
+  flex-direction: column;
+}
+.trip-badge-caption {
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.trip-badge-val {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.badge-edit-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  font-weight: 600;
+  margin-left: auto;
+}
+.badge-edit-pill svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* Store selection modal */
+.store-modal-body {
+  padding: 16px 20px 24px;
+}
+.store-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  padding-right: 4px;
+}
+.store-options-list::-webkit-scrollbar {
+  width: 4px;
+}
+.store-options-list::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 4px;
+}
+.store-option-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.store-option-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.store-option-card.active {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: var(--primary);
+}
+.store-opt-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-light);
+  flex-shrink: 0;
+}
+.store-option-card.active .store-opt-icon {
+  background: var(--primary);
+  color: #fff;
+}
+.store-opt-info {
+  flex: 1;
+  min-width: 0;
+}
+.store-opt-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.store-opt-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.store-opt-check {
+  display: none;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.store-option-card.active .store-opt-check {
+  display: block;
+}
