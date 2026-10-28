@@ -116,11 +116,14 @@ class GroceryStore {
     };
   }
 
-  saveState() {
+  saveState(skipCloudSync = false) {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
     } catch (e) {
       console.error('Storage save error:', e);
+    }
+    if (!skipCloudSync && window.firebaseSyncService && window.firebaseSyncService.isConfigured()) {
+      window.firebaseSyncService.scheduleRealtimeCartSync(this.state.cart);
     }
   }
 
@@ -383,6 +386,29 @@ class AudioFeedbackEngine {
 
     if (navigator.vibrate) {
       navigator.vibrate([40, 50, 40]);
+    }
+  }
+
+  playSyncChime() {
+    if (!store.state.soundEnabled) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(659.25, now);
+      osc.frequency.setValueAtTime(880, now + 0.08);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.22);
+    } catch (e) {}
+    if (navigator.vibrate) {
+      navigator.vibrate([20, 30, 20]);
     }
   }
 
@@ -686,6 +712,7 @@ class AppController {
       if (val && val > 0) {
         store.state.budgetLimit = val;
         store.saveState();
+        if (window.firebaseSyncService) window.firebaseSyncService.syncSettingsNow({ budgetLimit: val });
         this.renderBudgetAndSafetyGauge();
         this.showToast(`Batas anggaran diperbarui: ${formatRupiah(val)}`, 'success');
         audioEngine.playSuccess();
@@ -1347,6 +1374,7 @@ class AppController {
     if (val && val > 0) {
       store.state.budgetLimit = val;
       store.saveState();
+      if (window.firebaseSyncService) window.firebaseSyncService.syncSettingsNow({ budgetLimit: val });
       this.closeQuickBudgetModal();
       this.renderAll();
       this.showToast(`Batas anggaran diatur ke ${formatRupiah(val)}`, 'success');
@@ -1447,6 +1475,8 @@ class AppController {
 
     // Auto-sync trip to Firebase if connected
     if (window.firebaseSyncService && window.firebaseSyncService.isConfigured()) {
+      window.firebaseSyncService.syncSessionNow(newSession);
+      window.firebaseSyncService.syncCartNow([]);
       window.firebaseSyncService.uploadAllData(store.state).then(() => {
         console.log('Trip session auto-synced to Firebase');
       }).catch(err => {
@@ -1710,6 +1740,78 @@ class AppController {
     window.firebaseSyncService.onStatusChange((status, detail) => {
       this.updateFirebaseUI(status, detail);
     });
+
+    // Multi-device realtime onSnapshot listeners
+    window.firebaseSyncService.registerRealtimeCallbacks({
+      onCartUpdate: (items, isRemote, metadata) => {
+        this.handleRealtimeCartUpdate(items, isRemote, metadata);
+      },
+      onSettingsUpdate: (settings, isRemote) => {
+        this.handleRealtimeSettingsUpdate(settings, isRemote);
+      },
+      onHistoryUpdate: (sessions) => {
+        this.handleRealtimeHistoryUpdate(sessions);
+      }
+    });
+  }
+
+  handleRealtimeCartUpdate(items, isRemote, metadata) {
+    if (!Array.isArray(items)) return;
+
+    const currentJson = JSON.stringify(store.state.cart || []);
+    const incomingJson = JSON.stringify(items);
+    if (currentJson === incomingJson) return;
+
+    // Update local state without triggering outgoing sync loop
+    store.state.cart = items;
+    store.saveState(true);
+    this.renderAll();
+
+    if (isRemote) {
+      this.showToast('⚡ Troli diperbarui realtime dari perangkat lain!', 'info');
+      audioEngine.playSyncChime();
+      this.flashCloudIndicator();
+    }
+  }
+
+  handleRealtimeSettingsUpdate(settings, isRemote) {
+    if (!settings) return;
+    let changed = false;
+
+    if (typeof settings.budgetLimit === 'number' && settings.budgetLimit !== store.state.budgetLimit) {
+      store.state.budgetLimit = settings.budgetLimit;
+      changed = true;
+    }
+
+    if (changed) {
+      store.saveState(true);
+      this.renderBudgetAndSafetyGauge();
+      if (isRemote) {
+        this.showToast(`⚡ Batas belanja disinkronkan: ${formatRupiah(settings.budgetLimit)}`, 'info');
+        audioEngine.playSyncChime();
+        this.flashCloudIndicator();
+      }
+    }
+  }
+
+  handleRealtimeHistoryUpdate(sessions) {
+    if (!Array.isArray(sessions) || sessions.length === 0) return;
+    const currentJson = JSON.stringify(store.state.historySessions || []);
+    const incomingJson = JSON.stringify(sessions);
+    if (currentJson === incomingJson) return;
+
+    store.state.historySessions = sessions;
+    store.saveState(true);
+    this.renderHistorySessions();
+    this.renderHistoryAnalytics();
+  }
+
+  flashCloudIndicator() {
+    if (!this.cloudStatusChip) return;
+    this.cloudStatusChip.classList.add('flash-sync');
+    setTimeout(() => {
+      if (this.cloudStatusChip) this.cloudStatusChip.classList.remove('flash-sync');
+    }, 1200);
   }
 
   updateFirebaseUI(status, detail = '') {
@@ -1720,7 +1822,7 @@ class AppController {
 
     if (status === 'CONNECTED') {
       this.cloudStatusChip.classList.add('connected');
-      if (this.cloudStatusText) this.cloudStatusText.textContent = 'Cloud';
+      if (this.cloudStatusText) this.cloudStatusText.textContent = 'Realtime';
       if (this.firebaseDot) this.firebaseDot.classList.add('connected');
       if (this.firebaseStatusTitle) this.firebaseStatusTitle.textContent = 'Terhubung ke Firebase';
       if (this.firebaseStatusSubtitle) this.firebaseStatusSubtitle.textContent = detail || 'Firestore Siap Sinkron';
