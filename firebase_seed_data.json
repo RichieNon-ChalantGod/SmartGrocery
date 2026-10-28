@@ -5,7 +5,9 @@
       "soundEnabled": true,
       "activeCategory": "ALL",
       "currency": "IDR",
-      "updatedAt": "2026-10-07T04:50:00.000Z"
+      "updatedAt": "2026-10-07T04:50:00.000Z",
+      "activeStore": "Lotte Mart Grocery - Puri Indah",
+      "activeDate": "2026-10-28"
     },
     "active_cart": {
       "items": [
@@ -17,7 +19,9 @@
           "qty": 1,
           "price": 72000,
           "discountRaw": "",
-          "inTrolley": true
+          "inTrolley": true,
+          "storeLocation": "Lotte Mart Grocery - Puri Indah",
+          "date": "2026-10-28"
         },
         {
           "id": "item_seed_2",
@@ -27,7 +31,9 @@
           "qty": 1,
           "price": 32000,
           "discountRaw": "10%",
-          "inTrolley": true
+          "inTrolley": true,
+          "storeLocation": "Lotte Mart Grocery - Puri Indah",
+          "date": "2026-10-28"
         },
         {
           "id": "item_seed_3",
@@ -37,7 +43,9 @@
           "qty": 2,
           "price": 15500,
           "discountRaw": "",
-          "inTrolley": true
+          "inTrolley": true,
+          "storeLocation": "Lotte Mart Grocery - Puri Indah",
+          "date": "2026-10-28"
         },
         {
           "id": "item_seed_4",
@@ -47,7 +55,9 @@
           "qty": 1,
           "price": 24000,
           "discountRaw": "50+20",
-          "inTrolley": false
+          "inTrolley": false,
+          "storeLocation": "Lotte Mart Grocery - Puri Indah",
+          "date": "2026-10-28"
         }
       ],
       "itemCount": 4
@@ -151,12 +161,48 @@
       "totalSaved": 46000,
       "itemCount": 9,
       "items": [
-        { "name": "Beras Ramos 5kg", "qty": 1, "unit": "pack", "price": 69000, "category": "Bahan Pokok" },
-        { "name": "Minyak Goreng Sania 2L", "qty": 1, "unit": "liter", "price": 34000, "category": "Bahan Pokok" },
-        { "name": "Telur Ayam 1kg", "qty": 2, "unit": "kg", "price": 28500, "category": "Protein & Sayur" },
-        { "name": "Indomie Goreng (isi 5)", "qty": 3, "unit": "pack", "price": 15500, "category": "Bahan Pokok" },
-        { "name": "Deterjen Rinso 770g", "qty": 1, "unit": "pack", "price": 23000, "category": "Kebersihan & Mandi" },
-        { "name": "Susu UHT Ultra Milk 1L", "qty": 2, "unit": "liter", "price": 19500, "category": "Minuman & Snack" }
+        {
+          "name": "Beras Ramos 5kg",
+          "qty": 1,
+          "unit": "pack",
+          "price": 69000,
+          "category": "Bahan Pokok"
+        },
+        {
+          "name": "Minyak Goreng Sania 2L",
+          "qty": 1,
+          "unit": "liter",
+          "price": 34000,
+          "category": "Bahan Pokok"
+        },
+        {
+          "name": "Telur Ayam 1kg",
+          "qty": 2,
+          "unit": "kg",
+          "price": 28500,
+          "category": "Protein & Sayur"
+        },
+        {
+          "name": "Indomie Goreng (isi 5)",
+          "qty": 3,
+          "unit": "pack",
+          "price": 15500,
+          "category": "Bahan Pokok"
+        },
+        {
+          "name": "Deterjen Rinso 770g",
+          "qty": 1,
+          "unit": "pack",
+          "price": 23000,
+          "category": "Kebersihan & Mandi"
+        },
+        {
+          "name": "Susu UHT Ultra Milk 1L",
+          "qty": 2,
+          "unit": "liter",
+          "price": 19500,
+          "category": "Minuman & Snack"
+        }
       ]
     }
   ]

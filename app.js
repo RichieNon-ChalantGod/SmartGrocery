@@ -71,7 +71,7 @@ const INITIAL_ACTIVE_CART = [
 const INITIAL_PAST_SESSIONS = [
   {
     id: "session_sep_2026",
-    date: "28 September 2026",
+    date: '2026-10-28',
     timestamp: 1759050000000,
     totalSpent: 428000,
     budgetLimit: 500000,
@@ -548,6 +548,8 @@ class AppController {
     this.inputItemStore = document.getElementById('inputItemStore');
     this.inputItemDate = document.getElementById('inputItemDate');
     this.quickStoreChips = document.getElementById('quickStoreChips');
+    this.displayActiveStore = document.getElementById('displayActiveStore');
+    this.activeTripDatePicker = document.getElementById('activeTripDatePicker');
     this.btnClearDiscount = document.getElementById('btnClearDiscount');
     this.discountResultCallout = document.getElementById('discountResultCallout');
     this.calloutDiscountTitle = document.getElementById('calloutDiscountTitle');
@@ -790,6 +792,26 @@ class AppController {
     // Modal Close Triggers
     this.btnItemModalClose.addEventListener('click', () => this.closeItemModal());
     this.btnModalCancel.addEventListener('click', () => this.closeItemModal());
+
+    // Active Trip Date Picker Listener (SRS F-01)
+    if (this.activeTripDatePicker) {
+      this.activeTripDatePicker.addEventListener('change', (e) => {
+        const newDate = e.target.value;
+        store.state.activeDate = newDate;
+        if (this.inputItemDate) this.inputItemDate.value = newDate;
+        if (Array.isArray(store.state.cart)) {
+          store.state.cart.forEach(item => item.date = newDate);
+        }
+        store.saveState();
+        if (window.firebaseSyncService) {
+          window.firebaseSyncService.syncSettingsNow({ 
+            activeDate: newDate, 
+            activeStore: store.state.activeStore || 'Lotte Mart Grocery - Puri Indah' 
+          });
+        }
+        this.showToast(`Tanggal belanja diatur ke ${newDate}`, 'info');
+      });
+    }
 
     // Quick Store Chips Listener (SRS F-01)
     if (this.quickStoreChips) {
@@ -1206,15 +1228,15 @@ class AppController {
       this.inputItemPrice.value = item.price;
       this.inputItemQty.value = item.qty || 1;
       this.inputItemDiscount.value = item.discountRaw || '';
-      if (this.inputItemStore) this.inputItemStore.value = item.storeLocation || 'Superindo';
+      if (this.inputItemStore) this.inputItemStore.value = item.storeLocation || store.state.activeStore || 'Lotte Mart Grocery - Puri Indah';
       if (this.inputItemDate) this.inputItemDate.value = item.date || new Date().toISOString().split('T')[0];
       this.btnModalSubmit.innerHTML = `<i data-lucide="check"></i> Simpan Perubahan`;
     } else {
       this.itemModalTitle.textContent = 'Tambah Item Belanja';
       this.itemIdInput.value = '';
       this.inputItemQty.value = 1;
-      if (this.inputItemStore) this.inputItemStore.value = 'Superindo';
-      if (this.inputItemDate) this.inputItemDate.value = new Date().toISOString().split('T')[0];
+      if (this.inputItemStore) this.inputItemStore.value = store.state.activeStore || 'Lotte Mart Grocery - Puri Indah';
+      if (this.inputItemDate) this.inputItemDate.value = (this.activeTripDatePicker ? this.activeTripDatePicker.value : '') || store.state.activeDate || '2026-10-28';
       this.btnModalSubmit.innerHTML = `<i data-lucide="shopping-cart"></i> Simpan ke Troli`;
     }
 

@@ -137,6 +137,25 @@
         <section class="view-panel active" id="viewBelanja">
           
           <!-- Category Filter Bar (Ergonomic Horizontal Scroll) -->
+          <!-- Active Shopping Session Meta: Lokasi Toko & Selector Tanggal (SRS F-01) -->
+          <div class="active-session-strip" id="activeSessionStrip">
+            <div class="session-store-pill">
+              <i data-lucide="store" class="pill-icon text-primary"></i>
+              <div class="pill-content">
+                <span class="pill-caption">Lokasi Belanja:</span>
+                <span class="pill-value" id="displayActiveStore">Lotte Mart Grocery - Puri Indah</span>
+              </div>
+            </div>
+
+            <div class="session-date-picker-wrap">
+              <i data-lucide="calendar" class="pill-icon text-secondary"></i>
+              <div class="pill-content">
+                <label for="activeTripDatePicker" class="pill-caption">Tanggal Belanja:</label>
+                <input type="date" id="activeTripDatePicker" class="session-date-input" value="2026-10-28">
+              </div>
+            </div>
+          </div>
+
           <div class="category-filter-strip" id="categoryFilterStrip">
             <button class="filter-chip active" data-category="ALL">
               <i data-lucide="layout-grid"></i> Semua
@@ -493,7 +512,7 @@
                 </label>
                 <div class="input-with-icon">
                   <i data-lucide="store" class="field-icon"></i>
-                  <input type="text" id="inputItemStore" class="form-control" placeholder="Superindo / Alfamart..." value="Superindo">
+                  <input type="text" id="inputItemStore" class="form-control" placeholder="Superindo / Alfamart..." value="Lotte Mart Grocery - Puri Indah">
                 </div>
               </div>
 
@@ -510,10 +529,10 @@
 
             <!-- Quick Store Chips -->
             <div class="quick-store-chips" id="quickStoreChips">
-              <button type="button" class="chip-store-opt active" data-store="Superindo">Superindo</button>
+              <button type="button" class="chip-store-opt active" data-store="Lotte Mart Grocery - Puri Indah">Lotte Mart - Puri Indah</button>
+              <button type="button" class="chip-store-opt" data-store="Superindo">Superindo</button>
               <button type="button" class="chip-store-opt" data-store="Indomaret">Indomaret</button>
               <button type="button" class="chip-store-opt" data-store="Alfamart">Alfamart</button>
-              <button type="button" class="chip-store-opt" data-store="Hypermart">Hypermart</button>
               <button type="button" class="chip-store-opt" data-store="Pasar Tradisional">Pasar</button>
             </div>
 

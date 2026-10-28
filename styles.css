@@ -2435,3 +2435,62 @@ button {
   width: 10px;
   height: 10px;
 }
+
+/* Active session strip (Store location & Date picker) */
+.active-session-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+.session-store-pill, .session-date-picker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.session-store-pill .pill-icon, .session-date-picker-wrap .pill-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.session-store-pill .pill-content, .session-date-picker-wrap .pill-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.session-store-pill .pill-caption, .session-date-picker-wrap .pill-caption {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.session-store-pill .pill-value {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.session-date-input {
+  background: transparent;
+  border: none;
+  color: var(--primary-light);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+}
+.session-date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
